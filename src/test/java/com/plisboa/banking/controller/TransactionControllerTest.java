@@ -44,14 +44,21 @@ class TransactionControllerTest {
     transaction2.setTransactionDate(transactionDate);
     List<Transaction> transactions = Arrays.asList(transaction1, transaction2);
 
+    // Crie uma nova instância de Page<Client> com os elementos
+    Pageable pageable = PageRequest.of(0, 10);
+    Page<Transaction> page = new PageImpl<>(transactions, pageable, transactions.size());
+
+    PageRequest pageRequest = PageRequest.of(0, 10);
+
     when(
-        transactionService.findByAccountIdAndTransactionDate(clientId, transactionDate)).thenReturn(
-        transactions);
+        transactionService.findByAccountIdAndTransactionDate(clientId, transactionDate,
+            pageRequest)).thenReturn(
+        page);
 
-    List<Transaction> result = transactionController.transactionsByAccountAndDate(clientId,
-        transactionDate);
+    Page<Transaction> result = transactionController.transactionsByAccountAndDate(clientId,
+        transactionDate, 0, 10);
 
-    assertEquals(2, result.size());
+    assertEquals(2, result.getTotalElements());
   }
 
   @Test

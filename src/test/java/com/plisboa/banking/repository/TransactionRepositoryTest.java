@@ -6,10 +6,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import com.plisboa.banking.entity.Transaction;
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 
 @DataJpaTest
 class TransactionRepositoryTest {
@@ -41,12 +42,14 @@ class TransactionRepositoryTest {
     transactionRepository.save(transaction2);
     transactionRepository.save(transaction3);
 
-    List<Transaction> transactionsForAccount1 = transactionRepository.findByAccountIdAndTransactionDate(
-        "account1", LocalDate.now());
+    PageRequest pageRequest = PageRequest.of(0, 10);
 
-    assertEquals(2, transactionsForAccount1.size());
-    assertTrue(transactionsForAccount1.contains(transaction1));
-    assertTrue(transactionsForAccount1.contains(transaction2));
+    Page<Transaction> transactionsForAccount1 = transactionRepository.findByAccountIdAndTransactionDate(
+        "account1", LocalDate.now(), pageRequest);
+
+    assertEquals(2, transactionsForAccount1.getTotalElements());
+    assertTrue(transactionsForAccount1.getContent().contains(transaction1));
+    assertTrue(transactionsForAccount1.getContent().contains(transaction2));
   }
 }
 

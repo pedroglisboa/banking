@@ -3,7 +3,6 @@ package com.plisboa.banking.service;
 import com.plisboa.banking.entity.Transaction;
 import com.plisboa.banking.repository.TransactionRepository;
 import java.time.LocalDate;
-import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -18,15 +17,17 @@ public class TransactionService {
     this.transactionRepository = transactionRepository;
   }
 
-  public Page<Transaction> findAllTransactions(PageRequest pageRequest){
-   return transactionRepository.findAll(pageRequest);
+  public Page<Transaction> findAllTransactions(PageRequest pageRequest) {
+    return transactionRepository.findAll(pageRequest);
   }
 
   public Transaction createTransaction(@RequestBody Transaction transaction) {
     return transactionRepository.save(transaction);
   }
 
-  public List<Transaction> findByAccountIdAndTransactionDate(String accountId, LocalDate transactionDate) {
-    return transactionRepository.findByAccountIdAndTransactionDate(accountId, transactionDate);
+  public Page<Transaction> findByAccountIdAndTransactionDate(String accountId,
+      LocalDate transactionDate, PageRequest pageRequest) {
+    return transactionRepository.findByAccountIdAndTransactionDate(accountId, transactionDate,
+        pageRequest);
   }
 }

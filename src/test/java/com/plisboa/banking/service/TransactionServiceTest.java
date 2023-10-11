@@ -75,15 +75,22 @@ class TransactionServiceTest {
     List<Transaction> transactions = new ArrayList<>();
     transactions.add(new Transaction());
     transactions.add(new Transaction());
+
+    // Crie uma nova instância de Page<Client> com os elementos
+    Pageable pageable = PageRequest.of(0, 10);
+    Page<Transaction> page = new PageImpl<>(transactions, pageable, transactions.size());
+
+    PageRequest pageRequest = PageRequest.of(0, 10);
+
     when(transactionRepository.findByAccountIdAndTransactionDate(accountId,
-        transactionDate)).thenReturn(transactions);
+        transactionDate, pageRequest)).thenReturn(page);
 
     // Executa o método de teste
-    List<Transaction> foundTransactions = transactionService.findByAccountIdAndTransactionDate(
-        accountId, transactionDate);
+    Page<Transaction> foundTransactions = transactionService.findByAccountIdAndTransactionDate(
+        accountId, transactionDate, pageRequest);
 
     // Verifica o resultado
-    assertEquals(2, foundTransactions.size());
+    assertEquals(2, foundTransactions.getTotalElements());
   }
 }
 
