@@ -22,7 +22,6 @@ public class ClientService {
     return clientRepository.findAll();
   }
 
-
   public ResponseEntity<Client> getClientById(@PathVariable String id) {
     Optional<Client> client = clientRepository.findById(id);
     return client.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());

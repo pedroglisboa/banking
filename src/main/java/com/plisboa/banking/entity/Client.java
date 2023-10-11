@@ -3,7 +3,7 @@ package com.plisboa.banking.entity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import java.math.BigDecimal;
-import java.util.Date;
+import java.time.LocalDate;
 import lombok.Data;
 
 @Data
@@ -15,9 +15,6 @@ public class Client {
   private String name;
   private Boolean isPrimeExclusive;
   private BigDecimal balance;
-  private Date birthDate;
-
-  public Client() {
-  }
+  private LocalDate birthDate;
 
 }
