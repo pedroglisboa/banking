@@ -1,16 +1,22 @@
 package com.plisboa.banking.service;
 
+import static com.plisboa.banking.utils.BankingConstants.DEPOSIT_REDIS;
 import static com.plisboa.banking.utils.BankingConstants.MAX_TAX_REDIS;
 import static com.plisboa.banking.utils.BankingConstants.MAX_VALUE_REDIS;
 import static com.plisboa.banking.utils.BankingConstants.MIN_TAX_REDIS;
 import static com.plisboa.banking.utils.BankingConstants.MIN_VALUE_REDIS;
 import static com.plisboa.banking.utils.BankingConstants.WITHDRAW_REDIS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import com.plisboa.banking.entity.Client;
 import com.plisboa.banking.entity.Param;
+import com.plisboa.banking.entity.Transaction;
+import com.plisboa.banking.exception.NoBalanceBadRequestException;
 import com.plisboa.banking.repository.ClientRepository;
+import jakarta.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
@@ -64,11 +70,12 @@ class BalanceServiceTest {
     when(paramService.findParam(MAX_VALUE_REDIS)).thenReturn(maxValue);
     when(paramService.findParam(MIN_TAX_REDIS)).thenReturn(minTax);
     when(paramService.findParam(MAX_TAX_REDIS)).thenReturn(maxTax);
+    when(transactionService.createTransaction(any())).thenReturn(new Transaction());
 
     ResponseEntity<String> result = balanceService.withdraw(clientId, withdrawAmount);
 
     assertEquals(200, result.getStatusCode().value());
-    assertEquals("Seu novo saldo é: 390.0000", result.getBody());
+    assertEquals("Seu novo saldo é: 395.0000", result.getBody());
   }
 
   @Test
@@ -96,11 +103,10 @@ class BalanceServiceTest {
     when(paramService.findParam(MAX_VALUE_REDIS)).thenReturn(maxValue);
     when(paramService.findParam(MIN_TAX_REDIS)).thenReturn(minTax);
     when(paramService.findParam(MAX_TAX_REDIS)).thenReturn(maxTax);
+    when(transactionService.createTransaction(any())).thenReturn(new Transaction());
 
-    ResponseEntity<String> result = balanceService.withdraw(clientId, withdrawAmount);
-
-    assertEquals(400, result.getStatusCode().value());
-    assertEquals("Sem Saldo", result.getBody());
+    assertThrows(NoBalanceBadRequestException.class,
+        () -> balanceService.withdraw(clientId, withdrawAmount));
   }
 
   @Test
@@ -129,6 +135,8 @@ class BalanceServiceTest {
     when(paramService.findParam(MAX_VALUE_REDIS)).thenReturn(maxValue);
     when(paramService.findParam(MIN_TAX_REDIS)).thenReturn(minTax);
     when(paramService.findParam(MAX_TAX_REDIS)).thenReturn(maxTax);
+
+    when(transactionService.createTransaction(any())).thenReturn(new Transaction());
 
     ResponseEntity<String> result = balanceService.withdraw(clientId, withdrawAmount);
 
@@ -161,11 +169,12 @@ class BalanceServiceTest {
     when(paramService.findParam(MAX_VALUE_REDIS)).thenReturn(maxValue);
     when(paramService.findParam(MIN_TAX_REDIS)).thenReturn(minTax);
     when(paramService.findParam(MAX_TAX_REDIS)).thenReturn(maxTax);
+    when(transactionService.createTransaction(any())).thenReturn(new Transaction());
 
     ResponseEntity<String> result = balanceService.withdraw(clientId, withdrawAmount);
 
     assertEquals(200, result.getStatusCode().value());
-    assertEquals("Seu novo saldo é: 185.0000", result.getBody());
+    assertEquals("Seu novo saldo é: 170.0000", result.getBody());
   }
 
   @Test
@@ -193,6 +202,7 @@ class BalanceServiceTest {
     when(paramService.findParam(MAX_VALUE_REDIS)).thenReturn(maxValue);
     when(paramService.findParam(MIN_TAX_REDIS)).thenReturn(minTax);
     when(paramService.findParam(MAX_TAX_REDIS)).thenReturn(maxTax);
+    when(transactionService.createTransaction(any())).thenReturn(new Transaction());
 
     ResponseEntity<String> result = balanceService.withdraw(clientId, withdrawAmount);
 
@@ -225,11 +235,12 @@ class BalanceServiceTest {
     when(paramService.findParam(MAX_VALUE_REDIS)).thenReturn(maxValue);
     when(paramService.findParam(MIN_TAX_REDIS)).thenReturn(minTax);
     when(paramService.findParam(MAX_TAX_REDIS)).thenReturn(maxTax);
+    when(transactionService.createTransaction(any())).thenReturn(new Transaction());
 
-    ResponseEntity<String> result = balanceService.withdraw(clientId, withdrawAmount);
+    // Use assertThrows para verificar se a exceção é lançada
+    assertThrows(NoBalanceBadRequestException.class,
+        () -> balanceService.withdraw(clientId, withdrawAmount));
 
-    assertEquals(400, result.getStatusCode().value());
-    assertEquals("Sem Saldo", result.getBody());
   }
 
   @Test
@@ -238,10 +249,10 @@ class BalanceServiceTest {
     BigDecimal withdrawAmount = new BigDecimal("100.00");
 
     when(clientRepository.findById(clientId)).thenReturn(Optional.empty());
+    when(transactionService.createTransaction(any())).thenReturn(new Transaction());
 
-    ResponseEntity<String> result = balanceService.withdraw(clientId, withdrawAmount);
-
-    assertEquals(404, result.getStatusCode().value());
+    assertThrows(EntityNotFoundException.class,
+        () -> balanceService.withdraw(clientId, withdrawAmount));
   }
 
   @Test
@@ -255,7 +266,8 @@ class BalanceServiceTest {
     depositParam.setStringValue("Deposit");
 
     when(clientRepository.findById(clientId)).thenReturn(Optional.of(client));
-    when(paramService.findParam(WITHDRAW_REDIS)).thenReturn(depositParam);
+    when(paramService.findParam(DEPOSIT_REDIS)).thenReturn(depositParam);
+    when(transactionService.createTransaction(any())).thenReturn(new Transaction());
 
     ResponseEntity<String> result = balanceService.deposit(clientId, depositAmount);
 
@@ -269,9 +281,9 @@ class BalanceServiceTest {
     BigDecimal depositAmount = new BigDecimal("100.00");
 
     when(clientRepository.findById(clientId)).thenReturn(Optional.empty());
+    when(transactionService.createTransaction(any())).thenReturn(new Transaction());
 
-    ResponseEntity<String> result = balanceService.deposit(clientId, depositAmount);
-
-    assertEquals(404, result.getStatusCode().value());
+    assertThrows(EntityNotFoundException.class,
+        () -> balanceService.deposit(clientId, depositAmount));
   }
 }

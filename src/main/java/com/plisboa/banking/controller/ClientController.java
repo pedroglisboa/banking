@@ -5,7 +5,8 @@ import com.plisboa.banking.entity.Client;
 import com.plisboa.banking.service.ClientService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -30,12 +32,14 @@ public class ClientController {
 
   @GetMapping
   @Operation(summary = "Pegar todos os Clientes", description = "Este endpoint retorna todos os clientes.")
-  public List<Client> getAllClients() {
-    return clientService.getAllClients();
+  public Page<Client> getAllClients(@RequestParam(name = "page", defaultValue = "0") int page,
+      @RequestParam(name = "size", defaultValue = "10") int size) {
+    PageRequest pageRequest = PageRequest.of(page, size);
+    return clientService.getAllClients(pageRequest);
   }
 
   @GetMapping("/{id}")
-  @Operation(summary = "Pegar Cliente por AccountId", description = "Este endpoint retorna um cliente pelo AccountId.")
+  @Operation(summary = "Pegar Cliente por id", description = "Este endpoint retorna um cliente pelo id.")
   public ResponseEntity<Client> getClientById(@PathVariable String id) {
     return clientService.getClientById(id);
   }

@@ -4,6 +4,8 @@ import com.plisboa.banking.entity.Transaction;
 import com.plisboa.banking.repository.TransactionRepository;
 import java.time.LocalDate;
 import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -16,8 +18,8 @@ public class TransactionService {
     this.transactionRepository = transactionRepository;
   }
 
-  public List<Transaction> findAllTransactions(){
-   return transactionRepository.findAll();
+  public Page<Transaction> findAllTransactions(PageRequest pageRequest){
+   return transactionRepository.findAll(pageRequest);
   }
 
   public Transaction createTransaction(@RequestBody Transaction transaction) {

@@ -1,6 +1,7 @@
 package com.plisboa.banking.controller;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -15,6 +16,10 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 
 @SpringBootTest
@@ -56,11 +61,16 @@ class ClientControllerTest {
 
     List<Client> clients = Arrays.asList(client1, client2);
 
-    when(clientService.getAllClients()).thenReturn(clients);
+    // Crie uma nova instância de Page<Client> com os elementos
+    Pageable pageable = PageRequest.of(0, 10);
+    Page<Client> page = new PageImpl<>(clients, pageable, clients.size());
 
-    List<Client> result = clientController.getAllClients();
+    PageRequest pageRequest = PageRequest.of(0, 10);
+    when(clientService.getAllClients(pageRequest)).thenReturn(page);
 
-    assertEquals(2, result.size());
+    Page<Client> result = clientController.getAllClients(0, 10);
+
+    assertEquals(2, result.getTotalElements());
   }
 
   @Test
@@ -70,6 +80,7 @@ class ClientControllerTest {
     ResponseEntity<Client> result = clientController.getClientById("test123");
 
     assertEquals(200, result.getStatusCode().value());
+    assertNotNull(result.getBody());
     assertEquals("test123", result.getBody().getAccountId());
   }
 
@@ -94,6 +105,7 @@ class ClientControllerTest {
     ResponseEntity<Client> result = clientController.updateClient("test123", testClient);
 
     assertEquals(200, result.getStatusCode().value());
+    assertNotNull(result.getBody());
     assertEquals("Test Client", result.getBody().getName());
   }
 

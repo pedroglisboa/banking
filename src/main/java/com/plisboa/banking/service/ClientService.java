@@ -3,8 +3,9 @@ package com.plisboa.banking.service;
 import com.plisboa.banking.entity.Client;
 import com.plisboa.banking.repository.ClientRepository;
 import jakarta.persistence.EntityNotFoundException;
-import java.util.List;
 import java.util.Optional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,8 +20,8 @@ public class ClientService {
     this.clientRepository = clientRepository;
   }
 
-  public List<Client> getAllClients() {
-    return clientRepository.findAll();
+  public Page<Client> getAllClients(PageRequest pageRequest) {
+    return clientRepository.findAll(pageRequest);
   }
 
   public ResponseEntity<Client> getClientById(@PathVariable String id) {

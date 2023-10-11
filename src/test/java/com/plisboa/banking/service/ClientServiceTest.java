@@ -1,11 +1,14 @@
 package com.plisboa.banking.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import com.plisboa.banking.entity.Client;
 import com.plisboa.banking.repository.ClientRepository;
+import jakarta.persistence.EntityNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -14,6 +17,10 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 
 class ClientServiceTest {
@@ -34,11 +41,17 @@ class ClientServiceTest {
     List<Client> clients = new ArrayList<>();
     clients.add(new Client());
     clients.add(new Client());
-    when(clientRepository.findAll()).thenReturn(clients);
 
-    List<Client> result = clientService.getAllClients();
+    // Crie uma nova instância de Page<Client> com os elementos
+    Pageable pageable = PageRequest.of(0, 10);
+    Page<Client> page = new PageImpl<>(clients, pageable, clients.size());
 
-    assertEquals(2, result.size());
+    PageRequest pageRequest = PageRequest.of(0, 10);
+    when(clientRepository.findAll(pageRequest)).thenReturn(page);
+
+    Page<Client> result = clientService.getAllClients(pageRequest);
+
+    assertEquals(2, result.getTotalElements());
   }
 
   @Test
@@ -52,6 +65,7 @@ class ClientServiceTest {
     ResponseEntity<Client> result = clientService.getClientById(clientId);
 
     assertEquals(200, result.getStatusCode().value());
+    assertNotNull(result.getBody());
     assertEquals(clientId, result.getBody().getAccountId());
   }
 
@@ -88,6 +102,7 @@ class ClientServiceTest {
     ResponseEntity<Client> result = clientService.updateClient(clientId, client);
 
     assertEquals(200, result.getStatusCode().value());
+    assertNotNull(result.getBody());
     assertEquals(clientId, result.getBody().getAccountId());
   }
 
@@ -98,9 +113,7 @@ class ClientServiceTest {
 
     when(clientRepository.existsById(clientId)).thenReturn(false);
 
-    ResponseEntity<Client> result = clientService.updateClient(clientId, client);
-
-    assertEquals(404, result.getStatusCode().value());
+    assertThrows(EntityNotFoundException.class, () -> clientService.updateClient(clientId, client));
   }
 
   @Test
@@ -120,9 +133,9 @@ class ClientServiceTest {
 
     when(clientRepository.existsById(clientId)).thenReturn(false);
 
-    ResponseEntity<Void> result = clientService.deleteClient(clientId);
+    // Use assertThrows para verificar se a exceção é lançada
+    assertThrows(EntityNotFoundException.class, () -> clientService.deleteClient(clientId));
 
-    assertEquals(404, result.getStatusCode().value());
   }
 }
 

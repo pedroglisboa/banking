@@ -55,10 +55,11 @@ public class BalanceService {
       client.setBalance(newBalance);
       Transaction transaction = transactionService.createTransaction(
           buildTransaction(client.getAccountId(), withdrawParam.getStringValue(), withdraw));
-      logger.info(transaction.toString());
+
+      logger.info("Transaction: {}", transaction);
 
       clientRepository.save(client);
-      return ResponseEntity.ok().body("Seu novo saldo é:" + newBalance);
+      return ResponseEntity.ok().body("Seu novo saldo é: " + newBalance);
     } else {
       throw new EntityNotFoundException("Cliente não encontrado");
     }
@@ -81,7 +82,7 @@ public class BalanceService {
       client.setBalance(newBalance);
       Transaction transaction = transactionService.createTransaction(
           buildTransaction(client.getAccountId(), depositParam.getStringValue(), deposit));
-      logger.info(transaction.toString());
+      logger.info("Transaction: {}", transaction);
       clientRepository.save(client);
       logger.info("Novo saldo: {}", newBalance);
       return ResponseEntity.ok().body("Seu novo saldo é: " + newBalance);

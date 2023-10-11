@@ -13,6 +13,10 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 @SpringBootTest
 class TransactionControllerTest {
@@ -56,11 +60,17 @@ class TransactionControllerTest {
     Transaction transaction2 = new Transaction();
     List<Transaction> transactions = Arrays.asList(transaction1, transaction2);
 
-    when(transactionService.findAllTransactions()).thenReturn(transactions);
+    // Crie uma nova instância de Page<Client> com os elementos
+    Pageable pageable = PageRequest.of(0, 10);
+    Page<Transaction> page = new PageImpl<>(transactions, pageable, transactions.size());
 
-    List<Transaction> result = transactionController.transactions();
+    PageRequest pageRequest = PageRequest.of(0, 10);
 
-    assertEquals(2, result.size());
+    when(transactionService.findAllTransactions(pageRequest)).thenReturn(page);
+
+    Page<Transaction> result = transactionController.transactions(0, 10);
+
+    assertEquals(2, result.getTotalElements());
   }
 }
 
