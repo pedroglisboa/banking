@@ -2,6 +2,7 @@ package com.plisboa.banking.service;
 
 import com.plisboa.banking.entity.Client;
 import com.plisboa.banking.repository.ClientRepository;
+import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.http.ResponseEntity;
@@ -33,7 +34,7 @@ public class ClientService {
 
   public ResponseEntity<Client> updateClient(@PathVariable String id, @RequestBody Client client) {
     if (!clientRepository.existsById(id)) {
-      return ResponseEntity.notFound().build();
+      throw new EntityNotFoundException("Cliente não encontrado");
     }
     client.setAccountId(id);
     client = clientRepository.save(client);
@@ -42,7 +43,7 @@ public class ClientService {
 
   public ResponseEntity<Void> deleteClient(@PathVariable String id) {
     if (!clientRepository.existsById(id)) {
-      return ResponseEntity.notFound().build();
+      throw new EntityNotFoundException("Cliente não encontrado");
     }
     clientRepository.deleteById(id);
     return ResponseEntity.noContent().build();

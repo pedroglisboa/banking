@@ -20,8 +20,8 @@ public class TransactionService {
    return transactionRepository.findAll();
   }
 
-  public void createTransaction(@RequestBody Transaction transaction) {
-    transactionRepository.save(transaction);
+  public Transaction createTransaction(@RequestBody Transaction transaction) {
+    return transactionRepository.save(transaction);
   }
 
   public List<Transaction> findByAccountIdAndTransactionDate(String accountId, LocalDate transactionDate) {
