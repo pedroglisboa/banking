@@ -1,6 +1,6 @@
-# Nome da Sua Aplicação
+# Banking
 
-Descrição breve da sua aplicação.
+Olá, seja bem-vindo ao desafio para desenvolvedor backend Java, o foco desta etapa é testar seus conhecimentos técnicos em desenvolvimento de API’s de acordo com o escopo abaixo:
 
 ## Documentação da API
 
