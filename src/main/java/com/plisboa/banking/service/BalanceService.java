@@ -4,6 +4,7 @@ import com.plisboa.banking.domain.entity.Client;
 import com.plisboa.banking.domain.entity.Transaction;
 import com.plisboa.banking.domain.repository.ClientRepository;
 import com.plisboa.banking.exception.NoBalanceBadRequestException;
+import com.plisboa.banking.request.BalanceRequest;
 import com.plisboa.banking.utils.BankingConstants;
 import jakarta.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
@@ -26,7 +27,7 @@ public class BalanceService {
     this.transactionService = transactionService;
   }
 
-  public ResponseEntity<String> withdraw(String id, BigDecimal withdraw) {
+  public ResponseEntity<String> withdraw(String id, BalanceRequest withdraw) {
 
     Optional<Client> clientOptional = clientRepository.findById(id);
 
@@ -35,11 +36,10 @@ public class BalanceService {
       client = clientOptional.get();
       BigDecimal newBalance;
 
-      newBalance = withdraw(client, withdraw
-      );
+      newBalance = withdraw(client, withdraw.getValue());
       client.setBalance(newBalance);
       Transaction transaction = transactionService.createTransaction(
-          buildTransaction(client.getAccountId(), BankingConstants.WITHDRAW_STRING, withdraw));
+          buildTransaction(client.getAccountId(), BankingConstants.WITHDRAW_STRING, withdraw.getValue()));
 
       logger.info("Transaction: {}", transaction);
 
@@ -51,7 +51,7 @@ public class BalanceService {
 
   }
 
-  public ResponseEntity<String> deposit(String id, BigDecimal deposit) {
+  public ResponseEntity<String> deposit(String id, BalanceRequest deposit) {
 
     Optional<Client> clientOptional = clientRepository.findById(id);
 
@@ -61,10 +61,10 @@ public class BalanceService {
       BigDecimal newBalance;
       logger.info("Balance: {}", client.getBalance());
       logger.info("Depósito: +{}", deposit);
-      newBalance = client.getBalance().add(deposit);
+      newBalance = client.getBalance().add(deposit.getValue());
       client.setBalance(newBalance);
       Transaction transaction = transactionService.createTransaction(
-          buildTransaction(client.getAccountId(), BankingConstants.DEPOSIT_STRING, deposit));
+          buildTransaction(client.getAccountId(), BankingConstants.DEPOSIT_STRING, deposit.getValue()));
       logger.info("Transaction: {}", transaction);
       clientRepository.save(client);
       logger.info("Novo saldo: {}", newBalance);

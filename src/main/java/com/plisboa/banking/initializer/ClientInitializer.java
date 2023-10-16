@@ -24,7 +24,7 @@ public class ClientInitializer implements CommandLineRunner {
     Client cliente1 = new Client();
     cliente1.setAccountId("1");
     cliente1.setName("pedro");
-    cliente1.setBalance(new BigDecimal(100000));
+    cliente1.setBalance(new BigDecimal(10000));
     cliente1.setIsPrimeExclusive(true);
     cliente1.setBirthDate(LocalDate.of(1990, 5, 15));
     clientService.createClient(cliente1);
@@ -32,7 +32,7 @@ public class ClientInitializer implements CommandLineRunner {
     Client cliente2 = new Client();
     cliente2.setAccountId("2");
     cliente2.setName("gabriel");
-    cliente2.setBalance(new BigDecimal(100000));
+    cliente2.setBalance(new BigDecimal(10000));
     cliente2.setIsPrimeExclusive(false);
     cliente2.setBirthDate(LocalDate.of(1990, 5, 15));
     clientService.createClient(cliente2);

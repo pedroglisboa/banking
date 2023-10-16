@@ -9,6 +9,7 @@ import com.plisboa.banking.domain.entity.Client;
 import com.plisboa.banking.domain.entity.Transaction;
 import com.plisboa.banking.domain.repository.ClientRepository;
 import com.plisboa.banking.exception.NoBalanceBadRequestException;
+import com.plisboa.banking.request.BalanceRequest;
 import jakarta.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
 import java.util.Optional;
@@ -39,6 +40,7 @@ class BalanceServiceTest {
   void testWithdraw() {
     String clientId = "test123";
     BigDecimal withdrawAmount = new BigDecimal("100.00");
+    BalanceRequest balanceRequest = new BalanceRequest(withdrawAmount);
     Client client = new Client();
     client.setAccountId(clientId);
     client.setBalance(new BigDecimal("500.00"));
@@ -47,7 +49,7 @@ class BalanceServiceTest {
 
     when(transactionService.createTransaction(any())).thenReturn(new Transaction());
 
-    ResponseEntity<String> result = balanceService.withdraw(clientId, withdrawAmount);
+    ResponseEntity<String> result = balanceService.withdraw(clientId, balanceRequest);
 
     assertEquals(200, result.getStatusCode().value());
     assertEquals("Seu novo saldo é: 400.00", result.getBody());
@@ -57,16 +59,16 @@ class BalanceServiceTest {
   void testWithdraw_NotEnoughBalance() {
     String clientId = "test123";
     BigDecimal withdrawAmount = new BigDecimal("600.00");
+    BalanceRequest balanceRequest = new BalanceRequest(withdrawAmount);
     Client client = new Client();
     client.setAccountId(clientId);
     client.setBalance(new BigDecimal("500.00"));
 
     when(clientRepository.findById(clientId)).thenReturn(Optional.of(client));
-
     when(transactionService.createTransaction(any())).thenReturn(new Transaction());
 
     assertThrows(NoBalanceBadRequestException.class,
-        () -> balanceService.withdraw(clientId, withdrawAmount));
+        () -> balanceService.withdraw(clientId, balanceRequest));
   }
 
   @Test
@@ -77,12 +79,12 @@ class BalanceServiceTest {
     client.setAccountId(clientId);
     client.setBalance(new BigDecimal("100.00"));
     client.setIsPrimeExclusive(true);
+    BalanceRequest balanceRequest = new BalanceRequest(withdrawAmount);
 
     when(clientRepository.findById(clientId)).thenReturn(Optional.of(client));
-
     when(transactionService.createTransaction(any())).thenReturn(new Transaction());
 
-    ResponseEntity<String> result = balanceService.withdraw(clientId, withdrawAmount);
+    ResponseEntity<String> result = balanceService.withdraw(clientId, balanceRequest);
 
     assertEquals(200, result.getStatusCode().value());
     assertEquals("Seu novo saldo é: 85.00", result.getBody());
@@ -95,12 +97,12 @@ class BalanceServiceTest {
     Client client = new Client();
     client.setAccountId(clientId);
     client.setBalance(new BigDecimal("500.00"));
-
+    BalanceRequest balanceRequest = new BalanceRequest(withdrawAmount);
     when(clientRepository.findById(clientId)).thenReturn(Optional.of(client));
 
     when(transactionService.createTransaction(any())).thenReturn(new Transaction());
 
-    ResponseEntity<String> result = balanceService.withdraw(clientId, withdrawAmount);
+    ResponseEntity<String> result = balanceService.withdraw(clientId, balanceRequest);
 
     assertEquals(200, result.getStatusCode().value());
     assertEquals("Seu novo saldo é: 198.80000", result.getBody());
@@ -114,10 +116,12 @@ class BalanceServiceTest {
     client.setAccountId(clientId);
     client.setBalance(new BigDecimal("100.00"));
 
+    BalanceRequest balanceRequest = new BalanceRequest(withdrawAmount);
+
     when(clientRepository.findById(clientId)).thenReturn(Optional.of(client));
     when(transactionService.createTransaction(any())).thenReturn(new Transaction());
 
-    ResponseEntity<String> result = balanceService.withdraw(clientId, withdrawAmount);
+    ResponseEntity<String> result = balanceService.withdraw(clientId, balanceRequest);
 
     assertEquals(200, result.getStatusCode().value());
     assertEquals("Seu novo saldo é: 85.00", result.getBody());
@@ -130,13 +134,14 @@ class BalanceServiceTest {
     Client client = new Client();
     client.setAccountId(clientId);
     client.setBalance(new BigDecimal("100.00"));
+    BalanceRequest balanceRequest = new BalanceRequest(withdrawAmount);
 
     when(clientRepository.findById(clientId)).thenReturn(Optional.of(client));
     when(transactionService.createTransaction(any())).thenReturn(new Transaction());
 
     // Use assertThrows para verificar se a exceção é lançada
     assertThrows(NoBalanceBadRequestException.class,
-        () -> balanceService.withdraw(clientId, withdrawAmount));
+        () -> balanceService.withdraw(clientId, balanceRequest));
 
   }
 
@@ -144,18 +149,20 @@ class BalanceServiceTest {
   void testWithdraw_NotFound() {
     String clientId = "nonExistentId";
     BigDecimal withdrawAmount = new BigDecimal("100.00");
+    BalanceRequest balanceRequest = new BalanceRequest(withdrawAmount);
 
     when(clientRepository.findById(clientId)).thenReturn(Optional.empty());
     when(transactionService.createTransaction(any())).thenReturn(new Transaction());
 
     assertThrows(EntityNotFoundException.class,
-        () -> balanceService.withdraw(clientId, withdrawAmount));
+        () -> balanceService.withdraw(clientId, balanceRequest));
   }
 
   @Test
   void testDeposit() {
     String clientId = "test123";
     BigDecimal depositAmount = new BigDecimal("100.00");
+    BalanceRequest balanceRequest = new BalanceRequest(depositAmount);
     Client client = new Client();
     client.setAccountId(clientId);
     client.setBalance(new BigDecimal("500.00"));
@@ -163,7 +170,7 @@ class BalanceServiceTest {
     when(clientRepository.findById(clientId)).thenReturn(Optional.of(client));
     when(transactionService.createTransaction(any())).thenReturn(new Transaction());
 
-    ResponseEntity<String> result = balanceService.deposit(clientId, depositAmount);
+    ResponseEntity<String> result = balanceService.deposit(clientId, balanceRequest);
 
     assertEquals(200, result.getStatusCode().value());
     assertEquals("Seu novo saldo é: 600.00", result.getBody());
@@ -173,11 +180,11 @@ class BalanceServiceTest {
   void testDeposit_NotFound() {
     String clientId = "nonExistentId";
     BigDecimal depositAmount = new BigDecimal("100.00");
-
+BalanceRequest balanceRequest = new BalanceRequest(depositAmount);
     when(clientRepository.findById(clientId)).thenReturn(Optional.empty());
     when(transactionService.createTransaction(any())).thenReturn(new Transaction());
 
     assertThrows(EntityNotFoundException.class,
-        () -> balanceService.deposit(clientId, depositAmount));
+        () -> balanceService.deposit(clientId, balanceRequest));
   }
 }

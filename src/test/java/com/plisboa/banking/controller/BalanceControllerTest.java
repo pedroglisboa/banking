@@ -3,6 +3,7 @@ package com.plisboa.banking.controller;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
+import com.plisboa.banking.request.BalanceRequest;
 import com.plisboa.banking.service.BalanceService;
 import java.math.BigDecimal;
 import org.junit.jupiter.api.BeforeEach;
@@ -30,10 +31,11 @@ class BalanceControllerTest {
   void testWithdraw() {
     String clientId = "test123";
     BigDecimal withdrawAmount = new BigDecimal("100.00");
-    when(balanceService.withdraw(clientId, withdrawAmount)).thenReturn(
+    BalanceRequest balanceRequest = new BalanceRequest(withdrawAmount);
+    when(balanceService.withdraw(clientId, balanceRequest)).thenReturn(
         ResponseEntity.ok("Withdraw successful"));
 
-    ResponseEntity<String> result = balanceController.withdraw(clientId, withdrawAmount);
+    ResponseEntity<String> result = balanceController.withdraw(clientId, balanceRequest);
 
     assertEquals(200, result.getStatusCode().value());
     assertEquals("Withdraw successful", result.getBody());
@@ -43,10 +45,11 @@ class BalanceControllerTest {
   void testDeposit() {
     String clientId = "test123";
     BigDecimal depositAmount = new BigDecimal("200.00");
-    when(balanceService.deposit(clientId, depositAmount)).thenReturn(
+    BalanceRequest balanceRequest = new BalanceRequest(depositAmount);
+    when(balanceService.deposit(clientId, balanceRequest)).thenReturn(
         ResponseEntity.ok("Deposit successful"));
 
-    ResponseEntity<String> result = balanceController.deposit(clientId, depositAmount);
+    ResponseEntity<String> result = balanceController.deposit(clientId, balanceRequest);
 
     assertEquals(200, result.getStatusCode().value());
     assertEquals("Deposit successful", result.getBody());
