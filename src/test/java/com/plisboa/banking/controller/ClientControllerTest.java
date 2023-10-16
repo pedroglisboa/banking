@@ -5,7 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-import com.plisboa.banking.entity.Client;
+import com.plisboa.banking.domain.entity.Client;
+import com.plisboa.banking.request.ClientRequest;
 import com.plisboa.banking.service.ClientService;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -31,16 +32,20 @@ class ClientControllerTest {
   @Mock
   private ClientService clientService;
 
-  private Client testClient;
+  private ClientRequest clientRequest;
+
+  private Client client;
 
   @BeforeEach
   public void setUp() {
-    testClient = new Client();
-    testClient.setAccountId("test123");
-    testClient.setName("Test Client");
-    testClient.setIsPrimeExclusive(true);
-    testClient.setBalance(new BigDecimal("1000.00"));
-    testClient.setBirthDate(LocalDate.of(1990, 5, 15));
+    clientRequest = new ClientRequest();
+    clientRequest.setAccountId("test123");
+    clientRequest.setName("Test Client");
+    clientRequest.setIsPrimeExclusive(true);
+    clientRequest.setBalance(new BigDecimal("1000.00"));
+    clientRequest.setBirthDate(LocalDate.of(1990, 5, 15));
+
+    client = new Client(clientRequest);
   }
 
   @Test
@@ -75,7 +80,7 @@ class ClientControllerTest {
 
   @Test
   void testGetClientById() {
-    when(clientService.getClientById("test123")).thenReturn(ResponseEntity.ok(testClient));
+    when(clientService.getClientById("test123")).thenReturn(ResponseEntity.ok(client));
 
     ResponseEntity<Client> result = clientController.getClientById("test123");
 
@@ -86,9 +91,9 @@ class ClientControllerTest {
 
   @Test
   void testCreateClient() {
-    when(clientService.createClient(any(Client.class))).thenReturn(testClient);
+    when(clientService.createClient(clientRequest)).thenReturn(client);
 
-    Client createdClient = clientController.createClient(testClient);
+    Client createdClient = clientController.createClient(clientRequest);
 
     assertEquals("test123", createdClient.getAccountId());
     assertEquals("Test Client", createdClient.getName());
@@ -99,10 +104,10 @@ class ClientControllerTest {
 
   @Test
   void testUpdateClient() {
-    when(clientService.updateClient("test123", testClient)).thenReturn(
-        ResponseEntity.ok(testClient));
+    when(clientService.updateClient("test123", clientRequest)).thenReturn(
+        ResponseEntity.ok(client));
 
-    ResponseEntity<Client> result = clientController.updateClient("test123", testClient);
+    ResponseEntity<Client> result = clientController.updateClient("test123", clientRequest);
 
     assertEquals(200, result.getStatusCode().value());
     assertNotNull(result.getBody());

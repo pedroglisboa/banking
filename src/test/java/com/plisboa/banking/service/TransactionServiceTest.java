@@ -5,8 +5,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.plisboa.banking.entity.Transaction;
-import com.plisboa.banking.repository.TransactionRepository;
+import com.plisboa.banking.domain.entity.Transaction;
+import com.plisboa.banking.domain.repository.TransactionRepository;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;

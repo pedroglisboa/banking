@@ -6,8 +6,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-import com.plisboa.banking.entity.Client;
-import com.plisboa.banking.repository.ClientRepository;
+import com.plisboa.banking.domain.entity.Client;
+import com.plisboa.banking.domain.repository.ClientRepository;
 import jakarta.persistence.EntityNotFoundException;
 import java.util.ArrayList;
 import java.util.List;

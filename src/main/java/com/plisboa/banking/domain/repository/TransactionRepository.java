@@ -1,6 +1,6 @@
-package com.plisboa.banking.repository;
+package com.plisboa.banking.domain.repository;
 
-import com.plisboa.banking.entity.Transaction;
+import com.plisboa.banking.domain.entity.Transaction;
 import java.time.LocalDate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;

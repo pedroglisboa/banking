@@ -1,17 +1,10 @@
 package com.plisboa.banking.service;
 
-import static com.plisboa.banking.utils.BankingConstants.DEPOSIT_REDIS;
-import static com.plisboa.banking.utils.BankingConstants.MAX_TAX_REDIS;
-import static com.plisboa.banking.utils.BankingConstants.MAX_VALUE_REDIS;
-import static com.plisboa.banking.utils.BankingConstants.MIN_TAX_REDIS;
-import static com.plisboa.banking.utils.BankingConstants.MIN_VALUE_REDIS;
-import static com.plisboa.banking.utils.BankingConstants.WITHDRAW_REDIS;
-
-import com.plisboa.banking.entity.Client;
-import com.plisboa.banking.entity.Param;
-import com.plisboa.banking.entity.Transaction;
+import com.plisboa.banking.domain.entity.Client;
+import com.plisboa.banking.domain.entity.Transaction;
+import com.plisboa.banking.domain.repository.ClientRepository;
 import com.plisboa.banking.exception.NoBalanceBadRequestException;
-import com.plisboa.banking.repository.ClientRepository;
+import com.plisboa.banking.utils.BankingConstants;
 import jakarta.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -27,21 +20,13 @@ public class BalanceService {
   private final Logger logger = LoggerFactory.getLogger(BalanceService.class);
   private final ClientRepository clientRepository;
   private final TransactionService transactionService;
-  private final ParamService paramService;
 
-  public BalanceService(ClientRepository clientRepository, TransactionService transactionService,
-      ParamService paramService) {
+  public BalanceService(ClientRepository clientRepository, TransactionService transactionService) {
     this.clientRepository = clientRepository;
     this.transactionService = transactionService;
-    this.paramService = paramService;
   }
 
   public ResponseEntity<String> withdraw(String id, BigDecimal withdraw) {
-    Param withdrawParam = paramService.findParam(WITHDRAW_REDIS);
-    Param minValue = paramService.findParam(MIN_VALUE_REDIS);
-    Param maxValue = paramService.findParam(MAX_VALUE_REDIS);
-    Param minTax = paramService.findParam(MIN_TAX_REDIS);
-    Param maxTax = paramService.findParam(MAX_TAX_REDIS);
 
     Optional<Client> clientOptional = clientRepository.findById(id);
 
@@ -50,11 +35,11 @@ public class BalanceService {
       client = clientOptional.get();
       BigDecimal newBalance;
 
-      newBalance = withdraw(client, withdraw, minValue.getValue(), maxValue.getValue(),
-          minTax.getValue(), maxTax.getValue());
+      newBalance = withdraw(client, withdraw
+      );
       client.setBalance(newBalance);
       Transaction transaction = transactionService.createTransaction(
-          buildTransaction(client.getAccountId(), withdrawParam.getStringValue(), withdraw));
+          buildTransaction(client.getAccountId(), BankingConstants.WITHDRAW_STRING, withdraw));
 
       logger.info("Transaction: {}", transaction);
 
@@ -68,8 +53,6 @@ public class BalanceService {
 
   public ResponseEntity<String> deposit(String id, BigDecimal deposit) {
 
-    Param depositParam = paramService.findParam(DEPOSIT_REDIS);
-
     Optional<Client> clientOptional = clientRepository.findById(id);
 
     Client client;
@@ -81,7 +64,7 @@ public class BalanceService {
       newBalance = client.getBalance().add(deposit);
       client.setBalance(newBalance);
       Transaction transaction = transactionService.createTransaction(
-          buildTransaction(client.getAccountId(), depositParam.getStringValue(), deposit));
+          buildTransaction(client.getAccountId(), BankingConstants.DEPOSIT_STRING, deposit));
       logger.info("Transaction: {}", transaction);
       clientRepository.save(client);
       logger.info("Novo saldo: {}", newBalance);
@@ -91,8 +74,7 @@ public class BalanceService {
     }
   }
 
-  private BigDecimal withdraw(Client client, BigDecimal withdraw, BigDecimal minValue,
-      BigDecimal maxValue, BigDecimal taxMin, BigDecimal taxMax) {
+  private BigDecimal withdraw(Client client, BigDecimal withdraw) {
 
     BigDecimal newBalance;
     logger.info("Balance: {}", client.getBalance());
@@ -103,17 +85,20 @@ public class BalanceService {
       logger.info("Taxa: Exclusive Prime");
       newBalance = client.getBalance().subtract(withdraw);
       // less than minimum - free
-    } else if (withdraw.compareTo(minValue) <= 0) {
+    } else if (withdraw.compareTo(BankingConstants.MIN_VALUE) <= 0) {
       logger.info("Taxa: Livre");
       newBalance = client.getBalance().subtract(withdraw);
       // greater or equal than minimum and less than maximum
-    } else if (withdraw.compareTo(minValue) > 0 && withdraw.compareTo(maxValue) <= 0) {
-      logger.info("Taxa: {}", taxMin);
-      newBalance = client.getBalance().subtract(withdraw.add(withdraw.multiply(taxMin)));
+    } else if (withdraw.compareTo(BankingConstants.MIN_VALUE) > 0 && withdraw.compareTo(
+        BankingConstants.MAX_VALUE) <= 0) {
+      logger.info("Taxa: {}", BankingConstants.MIN_TAX);
+      newBalance = client.getBalance().subtract(withdraw.add(withdraw.multiply(
+          BankingConstants.MIN_TAX)));
       //greater than maximum
     } else {
-      logger.info("Taxa: {}", taxMax);
-      newBalance = client.getBalance().subtract(withdraw.add(withdraw.multiply(taxMax)));
+      logger.info("Taxa: {}", BankingConstants.MAX_TAX);
+      newBalance = client.getBalance().subtract(withdraw.add(withdraw.multiply(
+          BankingConstants.MAX_TAX)));
     }
 
     if (newBalance.compareTo(BigDecimal.ZERO) < 0) {
@@ -122,7 +107,6 @@ public class BalanceService {
     logger.info("Novo saldo: {}", newBalance);
     return newBalance;
   }
-
 
   private Transaction buildTransaction(String accountId, String type, BigDecimal value) {
     Transaction transaction = new Transaction();

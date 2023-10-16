@@ -1,10 +1,11 @@
-package com.plisboa.banking.repository;
+package com.plisboa.banking.domain.repository;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.plisboa.banking.entity.Client;
+import com.plisboa.banking.domain.entity.Client;
+import com.plisboa.banking.domain.repository.ClientRepository;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Optional;

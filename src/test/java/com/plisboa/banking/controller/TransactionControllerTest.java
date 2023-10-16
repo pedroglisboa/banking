@@ -3,7 +3,7 @@ package com.plisboa.banking.controller;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
-import com.plisboa.banking.entity.Transaction;
+import com.plisboa.banking.domain.entity.Transaction;
 import com.plisboa.banking.service.TransactionService;
 import java.time.LocalDate;
 import java.util.Arrays;

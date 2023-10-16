@@ -1,4 +1,4 @@
-package com.plisboa.banking.entity;
+package com.plisboa.banking.domain.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

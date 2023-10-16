@@ -1,15 +1,14 @@
 package com.plisboa.banking.service;
 
-import com.plisboa.banking.entity.Client;
-import com.plisboa.banking.repository.ClientRepository;
+import com.plisboa.banking.domain.entity.Client;
+import com.plisboa.banking.domain.repository.ClientRepository;
+import com.plisboa.banking.request.ClientRequest;
 import jakarta.persistence.EntityNotFoundException;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
 
 @Service
 public class ClientService {
@@ -24,16 +23,26 @@ public class ClientService {
     return clientRepository.findAll(pageRequest);
   }
 
-  public ResponseEntity<Client> getClientById(@PathVariable String id) {
+  public ResponseEntity<Client> getClientById(String id) {
     Optional<Client> client = clientRepository.findById(id);
     return client.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
   }
 
-  public Client createClient(@RequestBody Client client) {
+  public Client createClient(ClientRequest clientRequest) {
+    Client client = new Client(clientRequest);
+    return createClient(client);
+  }
+
+  public Client createClient(Client client) {
     return clientRepository.save(client);
   }
 
-  public ResponseEntity<Client> updateClient(@PathVariable String id, @RequestBody Client client) {
+  public ResponseEntity<Client> updateClient(String id, ClientRequest clientRequest) {
+    Client client = new Client(clientRequest);
+    return updateClient(id, client);
+  }
+
+  public ResponseEntity<Client> updateClient(String id, Client client) {
     if (!clientRepository.existsById(id)) {
       throw new EntityNotFoundException("Cliente não encontrado");
     }
@@ -42,7 +51,7 @@ public class ClientService {
     return ResponseEntity.ok(client);
   }
 
-  public ResponseEntity<Void> deleteClient(@PathVariable String id) {
+  public ResponseEntity<Void> deleteClient(String id) {
     if (!clientRepository.existsById(id)) {
       throw new EntityNotFoundException("Cliente não encontrado");
     }

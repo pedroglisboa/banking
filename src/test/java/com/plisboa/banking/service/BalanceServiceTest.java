@@ -1,21 +1,14 @@
 package com.plisboa.banking.service;
 
-import static com.plisboa.banking.utils.BankingConstants.DEPOSIT_REDIS;
-import static com.plisboa.banking.utils.BankingConstants.MAX_TAX_REDIS;
-import static com.plisboa.banking.utils.BankingConstants.MAX_VALUE_REDIS;
-import static com.plisboa.banking.utils.BankingConstants.MIN_TAX_REDIS;
-import static com.plisboa.banking.utils.BankingConstants.MIN_VALUE_REDIS;
-import static com.plisboa.banking.utils.BankingConstants.WITHDRAW_REDIS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-import com.plisboa.banking.entity.Client;
-import com.plisboa.banking.entity.Param;
-import com.plisboa.banking.entity.Transaction;
+import com.plisboa.banking.domain.entity.Client;
+import com.plisboa.banking.domain.entity.Transaction;
+import com.plisboa.banking.domain.repository.ClientRepository;
 import com.plisboa.banking.exception.NoBalanceBadRequestException;
-import com.plisboa.banking.repository.ClientRepository;
 import jakarta.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
 import java.util.Optional;
@@ -37,9 +30,6 @@ class BalanceServiceTest {
   @Mock
   private TransactionService transactionService;
 
-  @Mock
-  private ParamService paramService;
-
   @BeforeEach
   void setUp() {
     MockitoAnnotations.openMocks(this);
@@ -52,30 +42,15 @@ class BalanceServiceTest {
     Client client = new Client();
     client.setAccountId(clientId);
     client.setBalance(new BigDecimal("500.00"));
-    Param withdrawParam = new Param();
-    withdrawParam.setStringValue("withdraw");
-    Param minValue = new Param();
-    minValue.setValue(new BigDecimal("10.00"));
-    Param maxValue = new Param();
-    maxValue.setValue(new BigDecimal("200.00"));
-    Param minTax = new Param();
-    minTax.setValue(new BigDecimal("0.05"));
-    Param maxTax = new Param();
-    maxTax.setValue(new BigDecimal("0.10"));
 
     when(clientRepository.findById(clientId)).thenReturn(Optional.of(client));
 
-    when(paramService.findParam(WITHDRAW_REDIS)).thenReturn(withdrawParam);
-    when(paramService.findParam(MIN_VALUE_REDIS)).thenReturn(minValue);
-    when(paramService.findParam(MAX_VALUE_REDIS)).thenReturn(maxValue);
-    when(paramService.findParam(MIN_TAX_REDIS)).thenReturn(minTax);
-    when(paramService.findParam(MAX_TAX_REDIS)).thenReturn(maxTax);
     when(transactionService.createTransaction(any())).thenReturn(new Transaction());
 
     ResponseEntity<String> result = balanceService.withdraw(clientId, withdrawAmount);
 
     assertEquals(200, result.getStatusCode().value());
-    assertEquals("Seu novo saldo é: 395.0000", result.getBody());
+    assertEquals("Seu novo saldo é: 400.00", result.getBody());
   }
 
   @Test
@@ -85,24 +60,9 @@ class BalanceServiceTest {
     Client client = new Client();
     client.setAccountId(clientId);
     client.setBalance(new BigDecimal("500.00"));
-    Param withdrawParam = new Param();
-    withdrawParam.setStringValue("withdraw");
-    Param minValue = new Param();
-    minValue.setValue(new BigDecimal("10.00"));
-    Param maxValue = new Param();
-    maxValue.setValue(new BigDecimal("200.00"));
-    Param minTax = new Param();
-    minTax.setValue(new BigDecimal("0.05"));
-    Param maxTax = new Param();
-    maxTax.setValue(new BigDecimal("0.10"));
 
     when(clientRepository.findById(clientId)).thenReturn(Optional.of(client));
 
-    when(paramService.findParam(WITHDRAW_REDIS)).thenReturn(withdrawParam);
-    when(paramService.findParam(MIN_VALUE_REDIS)).thenReturn(minValue);
-    when(paramService.findParam(MAX_VALUE_REDIS)).thenReturn(maxValue);
-    when(paramService.findParam(MIN_TAX_REDIS)).thenReturn(minTax);
-    when(paramService.findParam(MAX_TAX_REDIS)).thenReturn(maxTax);
     when(transactionService.createTransaction(any())).thenReturn(new Transaction());
 
     assertThrows(NoBalanceBadRequestException.class,
@@ -117,24 +77,8 @@ class BalanceServiceTest {
     client.setAccountId(clientId);
     client.setBalance(new BigDecimal("100.00"));
     client.setIsPrimeExclusive(true);
-    Param withdrawParam = new Param();
-    withdrawParam.setStringValue("withdraw");
-    Param minValue = new Param();
-    minValue.setValue(new BigDecimal("20.00"));
-    Param maxValue = new Param();
-    maxValue.setValue(new BigDecimal("200.00"));
-    Param minTax = new Param();
-    minTax.setValue(new BigDecimal("0.05"));
-    Param maxTax = new Param();
-    maxTax.setValue(new BigDecimal("0.10"));
 
     when(clientRepository.findById(clientId)).thenReturn(Optional.of(client));
-
-    when(paramService.findParam(WITHDRAW_REDIS)).thenReturn(withdrawParam);
-    when(paramService.findParam(MIN_VALUE_REDIS)).thenReturn(minValue);
-    when(paramService.findParam(MAX_VALUE_REDIS)).thenReturn(maxValue);
-    when(paramService.findParam(MIN_TAX_REDIS)).thenReturn(minTax);
-    when(paramService.findParam(MAX_TAX_REDIS)).thenReturn(maxTax);
 
     when(transactionService.createTransaction(any())).thenReturn(new Transaction());
 
@@ -151,30 +95,15 @@ class BalanceServiceTest {
     Client client = new Client();
     client.setAccountId(clientId);
     client.setBalance(new BigDecimal("500.00"));
-    Param withdrawParam = new Param();
-    withdrawParam.setStringValue("withdraw");
-    Param minValue = new Param();
-    minValue.setValue(new BigDecimal("10.00"));
-    Param maxValue = new Param();
-    maxValue.setValue(new BigDecimal("200.00"));
-    Param minTax = new Param();
-    minTax.setValue(new BigDecimal("0.05"));
-    Param maxTax = new Param();
-    maxTax.setValue(new BigDecimal("0.10"));
 
     when(clientRepository.findById(clientId)).thenReturn(Optional.of(client));
 
-    when(paramService.findParam(WITHDRAW_REDIS)).thenReturn(withdrawParam);
-    when(paramService.findParam(MIN_VALUE_REDIS)).thenReturn(minValue);
-    when(paramService.findParam(MAX_VALUE_REDIS)).thenReturn(maxValue);
-    when(paramService.findParam(MIN_TAX_REDIS)).thenReturn(minTax);
-    when(paramService.findParam(MAX_TAX_REDIS)).thenReturn(maxTax);
     when(transactionService.createTransaction(any())).thenReturn(new Transaction());
 
     ResponseEntity<String> result = balanceService.withdraw(clientId, withdrawAmount);
 
     assertEquals(200, result.getStatusCode().value());
-    assertEquals("Seu novo saldo é: 170.0000", result.getBody());
+    assertEquals("Seu novo saldo é: 198.80000", result.getBody());
   }
 
   @Test
@@ -184,24 +113,8 @@ class BalanceServiceTest {
     Client client = new Client();
     client.setAccountId(clientId);
     client.setBalance(new BigDecimal("100.00"));
-    Param withdrawParam = new Param();
-    withdrawParam.setStringValue("withdraw");
-    Param minValue = new Param();
-    minValue.setValue(new BigDecimal("20.00"));
-    Param maxValue = new Param();
-    maxValue.setValue(new BigDecimal("200.00"));
-    Param minTax = new Param();
-    minTax.setValue(new BigDecimal("0.05"));
-    Param maxTax = new Param();
-    maxTax.setValue(new BigDecimal("0.10"));
 
     when(clientRepository.findById(clientId)).thenReturn(Optional.of(client));
-
-    when(paramService.findParam(WITHDRAW_REDIS)).thenReturn(withdrawParam);
-    when(paramService.findParam(MIN_VALUE_REDIS)).thenReturn(minValue);
-    when(paramService.findParam(MAX_VALUE_REDIS)).thenReturn(maxValue);
-    when(paramService.findParam(MIN_TAX_REDIS)).thenReturn(minTax);
-    when(paramService.findParam(MAX_TAX_REDIS)).thenReturn(maxTax);
     when(transactionService.createTransaction(any())).thenReturn(new Transaction());
 
     ResponseEntity<String> result = balanceService.withdraw(clientId, withdrawAmount);
@@ -217,24 +130,8 @@ class BalanceServiceTest {
     Client client = new Client();
     client.setAccountId(clientId);
     client.setBalance(new BigDecimal("100.00"));
-    Param withdrawParam = new Param();
-    withdrawParam.setStringValue("withdraw");
-    Param minValue = new Param();
-    minValue.setValue(new BigDecimal("10.00"));
-    Param maxValue = new Param();
-    maxValue.setValue(new BigDecimal("200.00"));
-    Param minTax = new Param();
-    minTax.setValue(new BigDecimal("0.05"));
-    Param maxTax = new Param();
-    maxTax.setValue(new BigDecimal("0.10"));
 
     when(clientRepository.findById(clientId)).thenReturn(Optional.of(client));
-
-    when(paramService.findParam(WITHDRAW_REDIS)).thenReturn(withdrawParam);
-    when(paramService.findParam(MIN_VALUE_REDIS)).thenReturn(minValue);
-    when(paramService.findParam(MAX_VALUE_REDIS)).thenReturn(maxValue);
-    when(paramService.findParam(MIN_TAX_REDIS)).thenReturn(minTax);
-    when(paramService.findParam(MAX_TAX_REDIS)).thenReturn(maxTax);
     when(transactionService.createTransaction(any())).thenReturn(new Transaction());
 
     // Use assertThrows para verificar se a exceção é lançada
@@ -262,11 +159,8 @@ class BalanceServiceTest {
     Client client = new Client();
     client.setAccountId(clientId);
     client.setBalance(new BigDecimal("500.00"));
-    Param depositParam = new Param();
-    depositParam.setStringValue("Deposit");
 
     when(clientRepository.findById(clientId)).thenReturn(Optional.of(client));
-    when(paramService.findParam(DEPOSIT_REDIS)).thenReturn(depositParam);
     when(transactionService.createTransaction(any())).thenReturn(new Transaction());
 
     ResponseEntity<String> result = balanceService.deposit(clientId, depositAmount);

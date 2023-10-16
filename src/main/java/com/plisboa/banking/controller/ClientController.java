@@ -1,10 +1,12 @@
 package com.plisboa.banking.controller;
 
 
-import com.plisboa.banking.entity.Client;
+import com.plisboa.banking.domain.entity.Client;
+import com.plisboa.banking.request.ClientRequest;
 import com.plisboa.banking.service.ClientService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
@@ -46,13 +48,14 @@ public class ClientController {
 
   @PostMapping
   @Operation(summary = "Criar Cliente", description = "Este endpoint cria um cliente.")
-  public Client createClient(@RequestBody Client client) {
+  public Client createClient(@Valid @RequestBody ClientRequest client) {
     return clientService.createClient(client);
   }
 
   @PutMapping("/{id}")
   @Operation(summary = "Alterar Cliente", description = "Este endpoint edita um cliente filtrado pelo AccountId.")
-  public ResponseEntity<Client> updateClient(@PathVariable String id, @RequestBody Client client) {
+  public ResponseEntity<Client> updateClient(@PathVariable String id,
+      @Valid @RequestBody ClientRequest client) {
     return clientService.updateClient(id, client);
   }
 

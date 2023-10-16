@@ -1,7 +1,7 @@
 package com.plisboa.banking.service;
 
-import com.plisboa.banking.entity.Transaction;
-import com.plisboa.banking.repository.TransactionRepository;
+import com.plisboa.banking.domain.entity.Transaction;
+import com.plisboa.banking.domain.repository.TransactionRepository;
 import java.time.LocalDate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;

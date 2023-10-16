@@ -1,9 +1,10 @@
-package com.plisboa.banking.repository;
+package com.plisboa.banking.domain.repository;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.plisboa.banking.entity.Transaction;
+import com.plisboa.banking.domain.entity.Transaction;
+import com.plisboa.banking.domain.repository.TransactionRepository;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import org.junit.jupiter.api.Test;
